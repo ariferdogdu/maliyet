@@ -2,517 +2,115 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<!-- Mobilde de masaüstü gibi görünmesi için sabit viewport -->
 <meta name="viewport" content="width=1200">
 <title>Erdoğdular İnşaat | İnşaat Maliyet Takip</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-:root{
-  --bg:#0b0f14;
-  --panel:#0f1622;
-  --panel2:#111b2a;
-  --muted:#9aa4b2;
-  --text:#e8edf4;
-  --line:rgba(255,255,255,.08);
-  --accent:#22c55e;
-  --accent2:#3b82f6;
-  --warn:#f59e0b;
-  --danger:#ef4444;
-  --shadow: 0 12px 30px rgba(0,0,0,.45);
-  --radius:14px;
-}
-
-*{box-sizing:border-box}
-body{
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  margin:0;
-  background: radial-gradient(1200px 700px at 20% -10%, rgba(34,197,94,.18), transparent 60%),
-              radial-gradient(900px 700px at 90% 10%, rgba(59,130,246,.16), transparent 55%),
-              linear-gradient(180deg, var(--bg), #070a0e);
-  color:var(--text);
-}
-
-/* Masaüstü layout'u sabitle */
-.wrapper{
-  width:1200px;
-  margin:0 auto;
-  padding:22px 18px 28px;
-}
-
-/* ÜST BAR */
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  padding:14px 16px;
-  border:1px solid var(--line);
-  border-radius: calc(var(--radius) + 4px);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width: 260px;
-}
-
-.brandLogo{
-  width:46px;
-  height:46px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.04);
-  object-fit:cover;
-}
-
-.brandText{ line-height:1.1; }
-.brandText .company{
-  font-weight:800;
-  letter-spacing:.5px;
-  text-transform:uppercase;
-  font-size:14px;
-  color:var(--text);
-}
-.brandText .app{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:3px;
-}
-
-.titleCenter{
-  flex:1;
-  text-align:center;
-  font-weight:900;
-  letter-spacing:1px;
-  font-size:22px;
-  white-space:nowrap;
-}
-.titleCenter span{
-  display:inline-block;
-  padding:6px 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
-}
-
-/* FORM KARTI */
-.card{
-  margin-top:16px;
-  padding:14px;
-  border:1px solid var(--line);
-  border-radius: calc(var(--radius) + 4px);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-  box-shadow: var(--shadow);
-}
-
-.formRow{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.fieldGroup{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-}
-
-label{
-  font-size:12px;
-  color:var(--muted);
-  margin-right:4px;
-}
-
-input,button{
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  outline:none;
-  font-size:14px;
-}
-
-input{
-  background: rgba(255,255,255,.03);
-  color:var(--text);
-  min-width: 160px;
-}
-
-input::placeholder{ color: rgba(232,237,244,.35); }
-
-button{
-  cursor:pointer;
-  font-weight:800;
-  border:1px solid rgba(255,255,255,.10);
-  transition: transform .08s ease, filter .15s ease;
-}
-button:active{ transform: translateY(1px); }
-button:hover{ filter: brightness(1.06); }
-
-.saveBtn{
-  background: linear-gradient(180deg, rgba(34,197,94,.95), rgba(34,197,94,.75));
-  color:#06210f;
-}
-
-.pdfBtn{
-  background: linear-gradient(180deg, rgba(59,130,246,.95), rgba(59,130,246,.75));
-  color:#07182f;
-}
-
-/* TABLO */
-.tableWrap{
-  margin-top:16px;
-  border-radius: calc(var(--radius) + 4px);
-  overflow:hidden;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.02);
-  box-shadow: var(--shadow);
-}
-
-.reportHeader{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 16px;
-  border-bottom:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-}
-
-.reportHeaderLeft{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.reportHeaderLeft img{
-  width:36px;
-  height:36px;
-  border-radius:10px;
-  object-fit:cover;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.04);
-}
-
-.reportHeaderLeft .rTitle{
-  font-weight:900;
-  letter-spacing:.8px;
-  text-transform:uppercase;
-  font-size:14px;
-}
-.reportHeaderLeft .rSub{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:2px;
-}
-
-.reportHeaderRight{
-  text-align:right;
-  font-size:12px;
-  color:var(--muted);
-}
-
-table{ border-collapse:collapse; width:100%; }
-
-th{
-  font-size:12px;
-  letter-spacing:.4px;
-  text-transform:uppercase;
-  color:rgba(232,237,244,.85);
-  background: rgba(255,255,255,.03);
-}
-
-th,td{
-  border-bottom:1px solid var(--line);
-  padding:12px 10px;
-  text-align:center;
-}
-
-tbody tr:hover td{ background: rgba(255,255,255,.02); }
-
-.kalemBaslik td{
-  background: rgba(255,255,255,.05);
-  font-weight:900;
-  letter-spacing:.6px;
-  text-transform:uppercase;
-}
-
-.actions{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-}
-
-.actionBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:36px;
-  height:32px;
-  border-radius:10px;
-  font-weight:900;
-  user-select:none;
-  border:1px solid rgba(255,255,255,.10);
-  cursor:pointer;
-}
-
-.duzenleBtn{
-  background: linear-gradient(180deg, rgba(245,158,11,.95), rgba(245,158,11,.70));
-  color:#2a1600;
-}
-
-.silBtn{
-  background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(239,68,68,.70));
-  color:#2a0707;
-}
-
-.bottomBar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 16px;
-  background: rgba(255,255,255,.02);
-}
-
-.toplam{
-  font-size:20px;
-  font-weight:900;
-  color:var(--accent);
-  margin-left:auto;
-  text-align:right;
-}
-
-.badge{
-  font-size:12px;
-  color:var(--muted);
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.02);
-}
-
-.footerNote{
-  margin-top:14px;
-  color: rgba(154,164,178,.85);
-  font-size:12px;
-  text-align:center;
-}
+body{font-family:Arial;background:#0b0f14;color:white;margin:0}
+.wrapper{width:1200px;margin:20px auto}
+h1{text-align:center}
+input,button{padding:8px;margin:5px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{border:1px solid #333;padding:8px;text-align:center}
+.toplam{font-size:20px;font-weight:bold;text-align:right;margin-top:10px;color:#22c55e}
 </style>
-
 </head>
-
 <body>
-  <div class="wrapper">
-    <!-- ÜST BAR (Premium görünüm) -->
-    <div class="topbar">
-      <div class="brand">
-        <!-- Logo dosyasını HTML ile aynı klasöre koy: "Erdoğdular Logo.jpg" -->
-        <img class="brandLogo" src="Erdoğdular Logo.jpg" alt="Erdoğdular İnşaat Logo">
-        <div class="brandText">
-          <div class="company">ERDOĞDULAR İNŞAAT</div>
-          <div class="app">İnşaat Maliyet Takip</div>
-        </div>
-      </div>
+<div class="wrapper">
+<h1>ERDOĞDULAR İNŞAAT - MALİYET TAKİP</h1>
 
-      <div class="titleCenter"><span>🏗️ İNŞAAT MALİYET TAKİP</span></div>
+<input type="date" id="tarih">
+<input type="text" id="kalem" placeholder="Kalem">
+<input type="number" id="tutar" placeholder="Tutar">
+<button onclick="ekle()">Kaydet</button>
+<button onclick="pdfAl()">PDF Kaydet</button>
 
-      <div style="min-width:260px; text-align:right; color:var(--muted); font-size:12px;">
-        <div>Yerel Kayıt: <b style="color:rgba(232,237,244,.9)">Açık</b></div>
-        <div style="opacity:.9">PDF çıktısı rapor alanından alınır</div>
-      </div>
-    </div>
+<table>
+<thead>
+<tr>
+<th>Tarih</th>
+<th>Kalem</th>
+<th>Tutar</th>
+<th>İşlem</th>
+</tr>
+</thead>
+<tbody id="liste"></tbody>
+</table>
 
-    <!-- GİRİŞ FORMU -->
-    <div class="card">
-      <div class="formRow">
-        <div class="fieldGroup">
-          <label for="tarih">Tarih:</label>
-          <input type="date" id="tarih">
+<div class="toplam">
+TOPLAM: <span id="toplam">0</span> TL
+</div>
+</div>
 
-          <label for="kalem">Kalem:</label>
-          <input type="text" id="kalem" placeholder="Örn: Hafriyat, Beton, Demir...">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, onSnapshot,
+  doc, deleteDoc, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-          <label for="tutar">Tutar:</label>
-          <input type="number" id="tutar" placeholder="₺">
-        </div>
 
-        <div class="fieldGroup">
-          <button class="saveBtn" onclick="ekle()">Kaydet</button>
-          <button class="pdfBtn" onclick="pdfAl()">PDF Kaydet</button>
-        </div>
-      </div>
-    </div>
+const firebaseConfig = {
+  apiKey: "AIzaSyALlObtK9SA_47iX1H8ZMtFPNtxo0b3pgI",
+  authDomain: "erdogdular-maliyet.firebaseapp.com",
+  projectId: "erdogdular-maliyet",
+  storageBucket: "erdogdular-maliyet.firebasestorage.app",
+  messagingSenderId: "683761580398",
+  appId: "1:683761580398:web:c903bd6b99e6f38904a97f"
+};
 
-    <!-- RAPOR ALANI (PDF buradan alınır) -->
-    <div id="raporAlan" class="tableWrap">
 
-      <div class="reportHeader">
-        <div class="reportHeaderLeft">
-          <img src="Erdoğdular Logo.jpg" alt="Erdoğdular İnşaat Logo">
-          <div>
-            <div class="rTitle">Erdoğdular İnşaat</div>
-            <div class="rSub">Maliyet Raporu</div>
-          </div>
-        </div>
-        <div class="reportHeaderRight">
-          <div id="raporTarih">Rapor Tarihi: -</div>
-          <div class="badge">TL • tr-TR format</div>
-        </div>
-      </div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-      <table>
-        <tr>
-          <th>Tarih</th>
-          <th>Kalem</th>
-          <th>Tutar</th>
-          <th>İşlem</th>
-        </tr>
+await signInAnonymously(auth);
 
-        <tbody id="liste"></tbody>
-      </table>
+let veriler = [];
 
-      <div class="bottomBar">
-        <div class="badge">Not: Kalem başlıkları otomatik gruplanır</div>
-
-        <div class="toplam">
-          TOPLAM MALİYET:
-          <span id="toplam">0</span> TL
-        </div>
-      </div>
-
-    </div>
-
-    <div class="footerNote">© <span id="yil"></span> Erdoğdular İnşaat • İnşaat Maliyet Takip</div>
-  </div>
-
-<script>
-let veriler = JSON.parse(localStorage.getItem("maliyet")) || [];
-
-function kaydet(){
-  localStorage.setItem("maliyet",JSON.stringify(veriler));
-}
-
-function formatTL(sayi){
-  return Number(sayi).toLocaleString('tr-TR');
-}
-
-function setRaporTarih(){
-  const d = new Date();
-  const tarih = d.toLocaleDateString('tr-TR', { year:'numeric', month:'2-digit', day:'2-digit' });
-  const saat  = d.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
-  document.getElementById("raporTarih").innerText = `Rapor Tarihi: ${tarih} ${saat}`;
-  document.getElementById("yil").innerText = d.getFullYear();
-}
+function formatTL(sayi){ return Number(sayi).toLocaleString('tr-TR'); }
 
 function goster(){
   let liste=document.getElementById("liste");
   liste.innerHTML="";
   let toplam=0;
-  let kalemler={};
-
-  veriler.forEach(function(v,i){
-    if(!kalemler[v.kalem]) kalemler[v.kalem]=[];
-    kalemler[v.kalem].push({data:v,index:i});
+  veriler.forEach(v=>{
     toplam+=Number(v.tutar);
-  });
-
-  for(let kalem in kalemler){
     liste.innerHTML+=`
-      <tr class="kalemBaslik">
-        <td colspan="4">${kalem}</td>
-      </tr>
-    `;
-
-    kalemler[kalem].forEach(function(v){
-      liste.innerHTML+=`
-        <tr>
-          <td>${v.data.tarih}</td>
-          <td>${v.data.kalem}</td>
-          <td><b>${formatTL(v.data.tutar)}</b> TL</td>
-          <td>
-            <div class="actions">
-              <span class="actionBtn duzenleBtn" title="Düzenle" onclick="duzenle(${v.index})">✏️</span>
-              <span class="actionBtn silBtn" title="Sil" onclick="sil(${v.index})">❌</span>
-            </div>
-          </td>
-        </tr>
-      `;
-    });
-  }
-
-  document.getElementById("toplam").innerHTML=formatTL(toplam);
-  setRaporTarih();
+      <tr>
+        <td>${v.tarih}</td>
+        <td>${v.kalem}</td>
+        <td>${formatTL(v.tutar)} TL</td>
+        <td><button onclick="sil('${v.id}')">Sil</button></td>
+      </tr>`;
+  });
+  document.getElementById("toplam").innerText=formatTL(toplam);
 }
 
-function ekle(){
-  let tarih=document.getElementById("tarih").value;
-  let kalem=document.getElementById("kalem").value.trim();
-  let tutar=document.getElementById("tutar").value;
-
-  if(tarih=="" || kalem=="" || tutar==""){
-    alert("Boş alan bırakma");
-    return;
-  }
-
-  veriler.push({ tarih:tarih, kalem:kalem, tutar:tutar });
-  kaydet();
+const q = query(collection(db,"maliyet"), orderBy("createdAt","asc"));
+onSnapshot(q,(snap)=>{
+  veriler = snap.docs.map(d=>({id:d.id,...d.data()}));
   goster();
+});
 
+window.ekle = async function(){
+  let tarih=document.getElementById("tarih").value;
+  let kalem=document.getElementById("kalem").value;
+  let tutar=document.getElementById("tutar").value;
+  if(!tarih||!kalem||!tutar) return alert("Boş alan bırakma");
+  await addDoc(collection(db,"maliyet"),{tarih,kalem,tutar,createdAt:serverTimestamp()});
   document.getElementById("kalem").value="";
   document.getElementById("tutar").value="";
 }
 
-function sil(i){
-  if(confirm("Silmek istiyor musun?")){
-    veriler.splice(i,1);
-    kaydet();
-    goster();
-  }
+window.sil = async function(id){
+  await deleteDoc(doc(db,"maliyet",id));
 }
 
-function duzenle(i){
-  let yeniTarih=prompt("Yeni tarih:",veriler[i].tarih);
-  if(yeniTarih==null) return;
-
-  let yeniKalem=prompt("Yeni kalem:",veriler[i].kalem);
-  if(yeniKalem==null) return;
-
-  let yeniTutar=prompt("Yeni tutar:",veriler[i].tutar);
-  if(yeniTutar==null) return;
-
-  veriler[i].tarih=yeniTarih;
-  veriler[i].kalem=yeniKalem.trim();
-  veriler[i].tutar=yeniTutar;
-
-  kaydet();
-  goster();
-}
-
-function pdfAl(){
-  setRaporTarih();
-  let element=document.getElementById("raporAlan");
-
-  const opt = {
-    margin: 8,
-    filename: "erdogdular_insaat_maliyet.pdf",
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
-  };
-
-  html2pdf().set(opt).from(element).save();
-}
-
-goster();
+window.pdfAl = function(){ html2pdf().from(document.body).save("maliyet.pdf"); }
 </script>
-
 </body>
 </html>
