@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>İnşaat Maliyet Takip</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+margin:20px;
+background:#111;
+color:white;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+font-size:28px;
+}
+
+input,button{
+
+padding:10px;
+margin:5px;
+border-radius:6px;
+border:none;
+
+}
+
+input{
+
+background:#1f1f1f;
+color:white;
+border:1px solid #444;
+
+}
+
+button{
+
+background:#2e7d32;
+color:white;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+
+background:#3fa647;
+}
+
+.pdfBtn{
+
+background:#1565c0;
+}
+
+.pdfBtn:hover{
+
+background:#1976d2;
+}
+
+table{
+
+border-collapse:collapse;
+width:100%;
+background:#1a1a1a;
+margin-top:10px;
+
+}
+
+th{
+
+background:#2a2a2a;
+
+}
+
+th,td{
+
+border:1px solid #333;
+padding:10px;
+text-align:center;
+
+}
+
+.kalemBaslik{
+
+background:#333;
+font-weight:bold;
+font-size:18px;
+
+}
+
+.toplam{
+
+font-size:26px;
+font-weight:bold;
+color:#4CAF50;
+text-align:right;
+margin-top:15px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🏗️ İNŞAAT MALİYET TAKİP</h1>
+
+Tarih:
+<input type="date" id="tarih">
+
+Kalem:
+<input type="text" id="kalem">
+
+Tutar:
+<input type="number" id="tutar">
+
+<button onclick="ekle()">Kaydet</button>
+
+<button class="pdfBtn" onclick="pdfAl()">PDF Kaydet</button>
+
+<div id="raporAlan">
+
+<table>
+
+<tr>
+
+<th>Tarih</th>
+<th>Kalem</th>
+<th>Tutar</th>
+
+</tr>
+
+<tbody id="liste">
+
+</tbody>
+
+</table>
+
+
+<div class="toplam">
+
+TOPLAM MALİYET: <span id="toplam">0</span> TL
+
+</div>
+
+</div>
+
+<script>
+
+let veriler = JSON.parse(localStorage.getItem("maliyet")) || [];
+
+function kaydet(){
+
+localStorage.setItem("maliyet",JSON.stringify(veriler));
+
+}
+
+function formatTL(sayi){
+
+return Number(sayi).toLocaleString('tr-TR');
+
+}
+
+
+function goster(){
+
+let liste=document.getElementById("liste");
+
+liste.innerHTML="";
+
+let toplam=0;
+
+let kalemler={};
+
+
+veriler.forEach(function(v){
+
+if(!kalemler[v.kalem]){
+
+kalemler[v.kalem]=[];
+
+}
+
+kalemler[v.kalem].push(v);
+
+toplam+=Number(v.tutar);
+
+});
+
+
+for(let kalem in kalemler){
+
+liste.innerHTML+=`
+
+<tr class="kalemBaslik">
+
+<td colspan="3">${kalem}</td>
+
+</tr>
+
+`;
+
+kalemler[kalem].forEach(function(v){
+
+liste.innerHTML+=`
+
+<tr>
+
+<td>${v.tarih}</td>
+
+<td>${v.kalem}</td>
+
+<td>${formatTL(v.tutar)} TL</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+
+document.getElementById("toplam").innerHTML=formatTL(toplam);
+
+}
+
+
+
+function ekle(){
+
+let tarih=document.getElementById("tarih").value;
+
+let kalem=document.getElementById("kalem").value;
+
+let tutar=document.getElementById("tutar").value;
+
+
+if(tarih=="" || kalem=="" || tutar==""){
+
+alert("Boş alan bırakma");
+
+return;
+
+}
+
+
+veriler.push({
+
+tarih:tarih,
+
+kalem:kalem,
+
+tutar:tutar
+
+});
+
+
+kaydet();
+
+goster();
+
+}
+
+
+function pdfAl(){
+
+let element=document.getElementById("raporAlan");
+
+html2pdf().from(element).save("insaat_maliyet.pdf");
+
+}
+
+
+
+goster();
+
+</script>
+
+</body>
+
+</html>
