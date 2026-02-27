@@ -2,7 +2,6 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<!-- Mobilde de masaüstü gibi görünmesi için sabit viewport -->
 <meta name="viewport" content="width=1200">
 <title>Erdoğdular İnşaat | İnşaat Maliyet Takip</title>
 
@@ -11,8 +10,6 @@
 <style>
 :root{
   --bg:#0b0f14;
-  --panel:#0f1622;
-  --panel2:#111b2a;
   --muted:#9aa4b2;
   --text:#e8edf4;
   --line:rgba(255,255,255,.08);
@@ -25,14 +22,39 @@
 }
 
 *{box-sizing:border-box}
+html, body{height:100%}
+
+/* ✅ iOS/telefonlarda görünen "dalga dalga renk bantları" için:
+   1) Daha yumuşak gradient
+   2) Çok hafif noise overlay (banding'i kırar) */
 body{
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
   margin:0;
-  background: radial-gradient(1200px 700px at 20% -10%, rgba(34,197,94,.18), transparent 60%),
-              radial-gradient(900px 700px at 90% 10%, rgba(59,130,246,.16), transparent 55%),
-              linear-gradient(180deg, var(--bg), #070a0e);
+  background-color: #070a0e;
+  background-image:
+    radial-gradient(900px 600px at 18% 0%, rgba(34,197,94,.14), transparent 62%),
+    radial-gradient(760px 600px at 92% 10%, rgba(59,130,246,.12), transparent 58%),
+    linear-gradient(180deg, var(--bg), #070a0e 68%);
+  background-repeat:no-repeat;
+  background-attachment:scroll;
   color:var(--text);
 }
+
+/* Noise overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size:220px 220px;
+  opacity:.06;
+  mix-blend-mode:overlay;
+  z-index:0;
+}
+
+/* İçerik üstte kalsın */
+.wrapper{position:relative; z-index:1;}
 
 /* Masaüstü layout'u sabitle */
 .wrapper{
@@ -310,18 +332,16 @@ tbody tr:hover td{ background: rgba(255,255,255,.02); }
 
 <body>
   <div class="wrapper">
-    <!-- ÜST BAR (Premium görünüm) -->
     <div class="topbar">
       <div class="brand">
-        <!-- Logo dosyasını HTML ile aynı klasöre koy: "Erdoğdular Logo.jpg" -->
         <img class="brandLogo" src="Erdoğdular Logo.jpg" alt="Erdoğdular İnşaat Logo">
         <div class="brandText">
           <div class="company">ERDOĞDULAR İNŞAAT</div>
-          <div class="app">İnşaat Maliyet Takip</div>
+          
         </div>
       </div>
 
-      <div class="titleCenter"><span>🏗️ İNŞAAT MALİYET TAKİP</span></div>
+      <div class="titleCenter"><span>İNŞAAT MALİYET TAKİP SİSTEMİ</span></div>
 
       <div style="min-width:260px; text-align:right; color:var(--muted); font-size:12px;">
         <div>Bulut Kayıt: <b style="color:rgba(232,237,244,.9)">Firebase</b></div>
@@ -329,7 +349,6 @@ tbody tr:hover td{ background: rgba(255,255,255,.02); }
       </div>
     </div>
 
-    <!-- GİRİŞ FORMU -->
     <div class="card">
       <div class="formRow">
         <div class="fieldGroup">
@@ -350,7 +369,6 @@ tbody tr:hover td{ background: rgba(255,255,255,.02); }
       </div>
     </div>
 
-    <!-- RAPOR ALANI (PDF buradan alınır) -->
     <div id="raporAlan" class="tableWrap">
 
       <div class="reportHeader">
@@ -389,10 +407,9 @@ tbody tr:hover td{ background: rgba(255,255,255,.02); }
 
     </div>
 
-    <div class="footerNote">© <span id="yil"></span> Erdoğdular İnşaat • İnşaat Maliyet Takip</div>
+    <div class="footerNote">© <span id="yil"></span> Erdoğdular İnşaat </div>
   </div>
 
-<!-- Firebase + Uygulama Script -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -416,10 +433,8 @@ const firebaseConfig = {
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Security rules request.auth != null olduğu için anonim giriş şart
   await signInAnonymously(auth);
 
-  // Firestore’dan gelen liste (id dahil)
   let veriler = [];
 
   function formatTL(sayi) {
@@ -440,14 +455,12 @@ const firebaseConfig = {
     let toplam = 0;
     let kalemler = {};
 
-    // Grupla
     veriler.forEach(v => {
       if (!kalemler[v.kalem]) kalemler[v.kalem] = [];
       kalemler[v.kalem].push(v);
       toplam += Number(v.tutar);
     });
 
-    // Yaz
     for (let kalem in kalemler) {
       liste.innerHTML += `
         <tr class="kalemBaslik">
@@ -476,7 +489,6 @@ const firebaseConfig = {
     setRaporTarih();
   }
 
-  // Canlı dinleme: biri ekleyince/silince herkes güncellenir
   const q = query(collection(db, "maliyet"), orderBy("createdAt", "asc"));
   onSnapshot(q, (snap) => {
     veriler = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -529,7 +541,7 @@ const firebaseConfig = {
   }
 
   window.pdfAl = function pdfAl() {
-    setRaporTarih(); // PDF öncesi güncel tarih
+    setRaporTarih();
     let element = document.getElementById("raporAlan");
 
     const opt = {
@@ -543,7 +555,6 @@ const firebaseConfig = {
     html2pdf().set(opt).from(element).save();
   }
 
-  // İlk tarih
   setRaporTarih();
 </script>
 
