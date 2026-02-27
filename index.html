@@ -22,84 +22,73 @@ font-size:28px;
 }
 
 input,button{
-
 padding:10px;
 margin:5px;
 border-radius:6px;
 border:none;
-
 }
 
 input{
-
 background:#1f1f1f;
 color:white;
 border:1px solid #444;
-
 }
 
 button{
-
 background:#2e7d32;
 color:white;
 cursor:pointer;
 font-weight:bold;
 }
 
-button:hover{
-
-background:#3fa647;
-}
-
 .pdfBtn{
-
 background:#1565c0;
 }
 
-.pdfBtn:hover{
-
-background:#1976d2;
-}
-
 table{
-
 border-collapse:collapse;
 width:100%;
 background:#1a1a1a;
-margin-top:10px;
-
 }
 
 th{
-
 background:#2a2a2a;
-
 }
 
 th,td{
-
 border:1px solid #333;
 padding:10px;
 text-align:center;
-
 }
 
 .kalemBaslik{
-
 background:#333;
 font-weight:bold;
 font-size:18px;
-
 }
 
 .toplam{
-
 font-size:26px;
 font-weight:bold;
 color:#4CAF50;
 text-align:right;
 margin-top:15px;
+}
 
+.silBtn{
+color:white;
+background:#c62828;
+padding:6px 10px;
+border-radius:5px;
+cursor:pointer;
+}
+
+.duzenleBtn{
+color:white;
+background:#ff9800;
+padding:6px 10px;
+border-radius:5px;
+cursor:pointer;
 }
 
 </style>
@@ -120,7 +109,6 @@ Tutar:
 <input type="number" id="tutar">
 
 <button onclick="ekle()">Kaydet</button>
-
 <button class="pdfBtn" onclick="pdfAl()">PDF Kaydet</button>
 
 <div id="raporAlan">
@@ -128,23 +116,21 @@ Tutar:
 <table>
 
 <tr>
-
 <th>Tarih</th>
 <th>Kalem</th>
 <th>Tutar</th>
-
+<th>İşlem</th>
 </tr>
 
 <tbody id="liste">
-
 </tbody>
 
 </table>
 
-
 <div class="toplam">
 
-TOPLAM MALİYET: <span id="toplam">0</span> TL
+TOPLAM MALİYET:
+<span id="toplam">0</span> TL
 
 </div>
 
@@ -178,7 +164,7 @@ let toplam=0;
 let kalemler={};
 
 
-veriler.forEach(function(v){
+veriler.forEach(function(v,i){
 
 if(!kalemler[v.kalem]){
 
@@ -186,7 +172,7 @@ kalemler[v.kalem]=[];
 
 }
 
-kalemler[v.kalem].push(v);
+kalemler[v.kalem].push({data:v,index:i});
 
 toplam+=Number(v.tutar);
 
@@ -199,7 +185,7 @@ liste.innerHTML+=`
 
 <tr class="kalemBaslik">
 
-<td colspan="3">${kalem}</td>
+<td colspan="4">${kalem}</td>
 
 </tr>
 
@@ -211,11 +197,19 @@ liste.innerHTML+=`
 
 <tr>
 
-<td>${v.tarih}</td>
+<td>${v.data.tarih}</td>
 
-<td>${v.kalem}</td>
+<td>${v.data.kalem}</td>
 
-<td>${formatTL(v.tutar)} TL</td>
+<td>${formatTL(v.data.tutar)} TL</td>
+
+<td>
+
+<span class="duzenleBtn" onclick="duzenle(${v.index})">✏️</span>
+
+<span class="silBtn" onclick="sil(${v.index})">❌</span>
+
+</td>
 
 </tr>
 
@@ -253,19 +247,56 @@ return;
 veriler.push({
 
 tarih:tarih,
-
 kalem:kalem,
-
 tutar:tutar
 
 });
 
 
 kaydet();
-
 goster();
 
 }
+
+
+
+function sil(i){
+
+if(confirm("Silmek istiyor musun?")){
+
+veriler.splice(i,1);
+
+kaydet();
+goster();
+
+}
+
+}
+
+
+
+function duzenle(i){
+
+let yeniTarih=prompt("Yeni tarih:",veriler[i].tarih);
+
+let yeniKalem=prompt("Yeni kalem:",veriler[i].kalem);
+
+let yeniTutar=prompt("Yeni tutar:",veriler[i].tutar);
+
+
+if(yeniTarih!=null){
+
+veriler[i].tarih=yeniTarih;
+veriler[i].kalem=yeniKalem;
+veriler[i].tutar=yeniTutar;
+
+kaydet();
+goster();
+
+}
+
+}
+
 
 
 function pdfAl(){
