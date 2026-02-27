@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+
 <meta charset="UTF-8">
 <title>İnşaat Maliyet Takip</title>
 
@@ -9,50 +10,37 @@
 <style>
 
 body{
-font-family:Arial;
-margin:20px;
 background:#111;
 color:white;
+font-family:Arial;
+margin:20px;
 }
 
 h1{
 text-align:center;
-margin-bottom:20px;
-font-size:28px;
-}
-
-input,button{
-padding:10px;
-margin:5px;
-border-radius:6px;
-border:none;
 }
 
 input{
-background:#1f1f1f;
+padding:10px;
+margin:5px;
+background:#222;
 color:white;
 border:1px solid #444;
 }
 
 button{
+padding:10px;
+margin:5px;
+border:none;
+border-radius:6px;
 background:#2e7d32;
 color:white;
-cursor:pointer;
-font-weight:bold;
-}
-
-.pdfBtn{
-background:#1565c0;
 }
 
 table{
-border-collapse:collapse;
 width:100%;
+border-collapse:collapse;
 background:#1a1a1a;
-}
-
-th{
-background:#2a2a2a;
 }
 
 th,td{
@@ -64,31 +52,21 @@ text-align:center;
 .kalemBaslik{
 background:#333;
 font-weight:bold;
-font-size:18px;
 }
 
 .toplam{
-font-size:26px;
-font-weight:bold;
-color:#4CAF50;
 text-align:right;
+font-size:26px;
+color:#4CAF50;
 margin-top:15px;
 }
 
 .silBtn{
-color:white;
 background:#c62828;
-padding:6px 10px;
-border-radius:5px;
-cursor:pointer;
 }
 
 .duzenleBtn{
-color:white;
 background:#ff9800;
-padding:6px 10px;
-border-radius:5px;
-cursor:pointer;
 }
 
 </style>
@@ -99,19 +77,12 @@ cursor:pointer;
 
 <h1>🏗️ İNŞAAT MALİYET TAKİP</h1>
 
-Tarih:
 <input type="date" id="tarih">
-
-Kalem:
 <input type="text" id="kalem">
-
-Tutar:
 <input type="number" id="tutar">
 
 <button onclick="ekle()">Kaydet</button>
-<button class="pdfBtn" onclick="pdfAl()">PDF Kaydet</button>
-
-<div id="raporAlan">
+<button onclick="pdfAl()">PDF</button>
 
 <table>
 
@@ -123,6 +94,7 @@ Tutar:
 </tr>
 
 <tbody id="liste">
+
 </tbody>
 
 </table>
@@ -130,27 +102,80 @@ Tutar:
 <div class="toplam">
 
 TOPLAM MALİYET:
-<span id="toplam">0</span> TL
 
-</div>
+<span id="toplam">0</span> TL
 
 </div>
 
 <script>
 
-let veriler = JSON.parse(localStorage.getItem("maliyet")) || [];
+let token="BURAYA_YENI_TOKEN";
+let user="ariferdogdu";
+let repo="maliyet";
+let file="veriler.json";
 
-function kaydet(){
+let veriler=[];
 
-localStorage.setItem("maliyet",JSON.stringify(veriler));
+function formatTL(s){
+
+return Number(s).toLocaleString('tr-TR');
 
 }
 
-function formatTL(sayi){
 
-return Number(sayi).toLocaleString('tr-TR');
+async function yukle(){
+
+let url=https://api.github.com/repos/${user}/${repo}/contents/${file};
+
+let res=await fetch(url);
+
+let data=await res.json();
+
+let content=atob(data.content);
+
+veriler=JSON.parse(content);
+
+window.sha=data.sha;
+
+goster();
 
 }
+
+
+async function kaydetGit(){
+
+let url=https://api.github.com/repos/${user}/${repo}/contents/${file};
+
+let body={
+
+message:"veri guncellendi",
+
+content:btoa(JSON.stringify(veriler,null,2)),
+
+sha:window.sha
+
+};
+
+
+await fetch(url,{
+
+method:"PUT",
+
+headers:{
+
+Authorization:"token "+token
+
+},
+
+body:JSON.stringify(body)
+
+});
+
+
+yukle();
+
+}
+
 
 
 function goster(){
@@ -164,13 +189,9 @@ let toplam=0;
 let kalemler={};
 
 
-veriler.forEach(function(v,i){
+veriler.forEach((v,i)=>{
 
-if(!kalemler[v.kalem]){
-
-kalemler[v.kalem]=[];
-
-}
+if(!kalemler[v.kalem]) kalemler[v.kalem]=[];
 
 kalemler[v.kalem].push({data:v,index:i});
 
@@ -179,19 +200,19 @@ toplam+=Number(v.tutar);
 });
 
 
-for(let kalem in kalemler){
+for(let k in kalemler){
 
 liste.innerHTML+=`
 
 <tr class="kalemBaslik">
 
-<td colspan="4">${kalem}</td>
+<td colspan="4">${k}</td>
 
 </tr>
 
 `;
 
-kalemler[kalem].forEach(function(v){
+kalemler[k].forEach(v=>{
 
 liste.innerHTML+=`
 
@@ -205,9 +226,9 @@ liste.innerHTML+=`
 
 <td>
 
-<span class="duzenleBtn" onclick="duzenle(${v.index})">✏️</span>
+<button class="duzenleBtn" onclick="duzenle(${v.index})">✏️</button>
 
-<span class="silBtn" onclick="sil(${v.index})">❌</span>
+<button class="silBtn" onclick="sil(${v.index})">❌</button>
 
 </td>
 
@@ -228,33 +249,17 @@ document.getElementById("toplam").innerHTML=formatTL(toplam);
 
 function ekle(){
 
-let tarih=document.getElementById("tarih").value;
-
-let kalem=document.getElementById("kalem").value;
-
-let tutar=document.getElementById("tutar").value;
-
-
-if(tarih=="" || kalem=="" || tutar==""){
-
-alert("Boş alan bırakma");
-
-return;
-
-}
-
-
 veriler.push({
 
-tarih:tarih,
-kalem:kalem,
-tutar:tutar
+tarih:document.getElementById("tarih").value,
+
+kalem:document.getElementById("kalem").value,
+
+tutar:document.getElementById("tutar").value
 
 });
 
-
-kaydet();
-goster();
+kaydetGit();
 
 }
 
@@ -262,14 +267,9 @@ goster();
 
 function sil(i){
 
-if(confirm("Silmek istiyor musun?")){
-
 veriler.splice(i,1);
 
-kaydet();
-goster();
-
-}
+kaydetGit();
 
 }
 
@@ -277,23 +277,21 @@ goster();
 
 function duzenle(i){
 
-let yeniTarih=prompt("Yeni tarih:",veriler[i].tarih);
+let t=prompt("Tarih",veriler[i].tarih);
 
-let yeniKalem=prompt("Yeni kalem:",veriler[i].kalem);
+let k=prompt("Kalem",veriler[i].kalem);
 
-let yeniTutar=prompt("Yeni tutar:",veriler[i].tutar);
+let u=prompt("Tutar",veriler[i].tutar);
 
+veriler[i]={
 
-if(yeniTarih!=null){
+tarih:t,
+kalem:k,
+tutar:u
 
-veriler[i].tarih=yeniTarih;
-veriler[i].kalem=yeniKalem;
-veriler[i].tutar=yeniTutar;
+};
 
-kaydet();
-goster();
-
-}
+kaydetGit();
 
 }
 
@@ -301,15 +299,13 @@ goster();
 
 function pdfAl(){
 
-let element=document.getElementById("raporAlan");
-
-html2pdf().from(element).save("insaat_maliyet.pdf");
+html2pdf().from(document.body).save("insaat_maliyet.pdf");
 
 }
 
 
 
-goster();
+yukle();
 
 </script>
 
