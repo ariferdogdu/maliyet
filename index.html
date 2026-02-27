@@ -1,314 +1,523 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-
 <meta charset="UTF-8">
-<title>İnşaat Maliyet Takip</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erdoğdular İnşaat | İnşaat Maliyet Takip</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-
-body{
-background:#111;
-color:white;
-font-family:Arial;
-margin:20px;
+:root{
+  --bg:#0b0f14;
+  --panel:#0f1622;
+  --panel2:#111b2a;
+  --muted:#9aa4b2;
+  --text:#e8edf4;
+  --line:rgba(255,255,255,.08);
+  --accent:#22c55e;
+  --accent2:#3b82f6;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --shadow: 0 12px 30px rgba(0,0,0,.45);
+  --radius:14px;
 }
 
-h1{
-text-align:center;
+*{box-sizing:border-box}
+body{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  margin:0;
+  background: radial-gradient(1200px 700px at 20% -10%, rgba(34,197,94,.18), transparent 60%),
+              radial-gradient(900px 700px at 90% 10%, rgba(59,130,246,.16), transparent 55%),
+              linear-gradient(180deg, var(--bg), #070a0e);
+  color:var(--text);
+}
+
+.wrapper{
+  max-width:1200px;
+  margin:0 auto;
+  padding:22px 18px 28px;
+}
+
+/* ÜST BAR */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width: 260px;
+}
+
+.brandLogo{
+  width:46px;
+  height:46px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.04);
+  object-fit:cover;
+}
+
+.brandText{ line-height:1.1; }
+.brandText .company{
+  font-weight:800;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+  font-size:14px;
+  color:var(--text);
+}
+.brandText .app{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.titleCenter{
+  flex:1;
+  text-align:center;
+  font-weight:900;
+  letter-spacing:1px;
+  font-size:22px;
+  white-space:nowrap;
+}
+.titleCenter span{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+}
+
+/* FORM KARTI */
+.card{
+  margin-top:16px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow: var(--shadow);
+}
+
+.formRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.fieldGroup{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+
+label{
+  font-size:12px;
+  color:var(--muted);
+  margin-right:4px;
+}
+
+input,button{
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  outline:none;
+  font-size:14px;
 }
 
 input{
-padding:10px;
-margin:5px;
-background:#222;
-color:white;
-border:1px solid #444;
+  background: rgba(255,255,255,.03);
+  color:var(--text);
+  min-width: 160px;
 }
+
+input::placeholder{ color: rgba(232,237,244,.35); }
 
 button{
-padding:10px;
-margin:5px;
-border:none;
-border-radius:6px;
-background:#2e7d32;
-color:white;
+  cursor:pointer;
+  font-weight:800;
+  border:1px solid rgba(255,255,255,.10);
+  transition: transform .08s ease, filter .15s ease;
+}
+button:active{ transform: translateY(1px); }
+button:hover{ filter: brightness(1.06); }
+
+.saveBtn{
+  background: linear-gradient(180deg, rgba(34,197,94,.95), rgba(34,197,94,.75));
+  color:#06210f;
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:#1a1a1a;
+.pdfBtn{
+  background: linear-gradient(180deg, rgba(59,130,246,.95), rgba(59,130,246,.75));
+  color:#07182f;
+}
+
+/* TABLO */
+.tableWrap{
+  margin-top:16px;
+  border-radius: calc(var(--radius) + 4px);
+  overflow:hidden;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  box-shadow: var(--shadow);
+}
+
+.reportHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+}
+
+.reportHeaderLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.reportHeaderLeft img{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  object-fit:cover;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.04);
+}
+
+.reportHeaderLeft .rTitle{
+  font-weight:900;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  font-size:14px;
+}
+.reportHeaderLeft .rSub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.reportHeaderRight{
+  text-align:right;
+  font-size:12px;
+  color:var(--muted);
+}
+
+table{ border-collapse:collapse; width:100%; }
+
+th{
+  font-size:12px;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+  color:rgba(232,237,244,.85);
+  background: rgba(255,255,255,.03);
 }
 
 th,td{
-border:1px solid #333;
-padding:10px;
-text-align:center;
+  border-bottom:1px solid var(--line);
+  padding:12px 10px;
+  text-align:center;
 }
 
-.kalemBaslik{
-background:#333;
-font-weight:bold;
+tbody tr:hover td{ background: rgba(255,255,255,.02); }
+
+.kalemBaslik td{
+  background: rgba(255,255,255,.05);
+  font-weight:900;
+  letter-spacing:.6px;
+  text-transform:uppercase;
 }
 
-.toplam{
-text-align:right;
-font-size:26px;
-color:#4CAF50;
-margin-top:15px;
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:8px;
 }
 
-.silBtn{
-background:#c62828;
+.actionBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:32px;
+  border-radius:10px;
+  font-weight:900;
+  user-select:none;
+  border:1px solid rgba(255,255,255,.10);
+  cursor:pointer;
 }
 
 .duzenleBtn{
-background:#ff9800;
+  background: linear-gradient(180deg, rgba(245,158,11,.95), rgba(245,158,11,.70));
+  color:#2a1600;
 }
 
+.silBtn{
+  background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(239,68,68,.70));
+  color:#2a0707;
+}
+
+.bottomBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  background: rgba(255,255,255,.02);
+}
+
+.toplam{
+  font-size:20px;
+  font-weight:900;
+  color:var(--accent);
+  margin-left:auto;
+  text-align:right;
+}
+
+.badge{
+  font-size:12px;
+  color:var(--muted);
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+}
+
+.footerNote{
+  margin-top:14px;
+  color: rgba(154,164,178,.85);
+  font-size:12px;
+  text-align:center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 720px){
+  .titleCenter{ display:none; }
+  input{ min-width: 140px; }
+  .brand{ min-width: unset; }
+}
 </style>
 
 </head>
 
 <body>
+  <div class="wrapper">
+    <!-- ÜST BAR (Premium görünüm) -->
+    <div class="topbar">
+      <div class="brand">
+        <!-- Logo dosyasını HTML ile aynı klasöre koy: "Erdoğdular Logo.jpg" -->
+        <img class="brandLogo" src="Erdoğdular Logo.jpg" alt="Erdoğdular İnşaat Logo">
+        <div class="brandText">
+          <div class="company">ERDOĞDULAR İNŞAAT</div>
+          <div class="app">İnşaat Maliyet Takip</div>
+        </div>
+      </div>
 
-<h1>🏗️ İNŞAAT MALİYET TAKİP</h1>
+     
 
-<input type="date" id="tarih">
-<input type="text" id="kalem">
-<input type="number" id="tutar">
+      <div style="min-width:260px; text-align:right; color:var(--muted); font-size:12px;">
+        <div>Yerel Kayıt: <b style="color:rgba(232,237,244,.9)">Açık</b></div>
+        <div style="opacity:.9">PDF çıktısı rapor alanından alınır</div>
+      </div>
+    </div>
 
-<button onclick="ekle()">Kaydet</button>
-<button onclick="pdfAl()">PDF</button>
+    <!-- GİRİŞ FORMU -->
+    <div class="card">
+      <div class="formRow">
+        <div class="fieldGroup">
+          <label for="tarih">Tarih:</label>
+          <input type="date" id="tarih">
 
-<table>
+          <label for="kalem">Kalem:</label>
+          <input type="text" id="kalem" placeholder="Örn: Hafriyat, Beton, Demir...">
 
-<tr>
-<th>Tarih</th>
-<th>Kalem</th>
-<th>Tutar</th>
-<th>İşlem</th>
-</tr>
+          <label for="tutar">Tutar:</label>
+          <input type="number" id="tutar" placeholder="₺">
+        </div>
 
-<tbody id="liste">
+        <div class="fieldGroup">
+          <button class="saveBtn" onclick="ekle()">Kaydet</button>
+          <button class="pdfBtn" onclick="pdfAl()">PDF Kaydet</button>
+        </div>
+      </div>
+    </div>
 
-</tbody>
+    <!-- RAPOR ALANI (PDF buradan alınır) -->
+    <div id="raporAlan" class="tableWrap">
 
-</table>
+      <div class="reportHeader">
+        <div class="reportHeaderLeft">
+          <img src="Erdoğdular Logo.jpg" alt="Erdoğdular İnşaat Logo">
+          <div>
+            <div class="rTitle">Erdoğdular İnşaat</div>
+            <div class="rSub">Maliyet Raporu</div>
+          </div>
+        </div>
+        <div class="reportHeaderRight">
+          <div id="raporTarih">Rapor Tarihi: -</div>
+          <div class="badge">TL • tr-TR format</div>
+        </div>
+      </div>
 
-<div class="toplam">
+      <table>
+        <tr>
+          <th>Tarih</th>
+          <th>Kalem</th>
+          <th>Tutar</th>
+          <th>İşlem</th>
+        </tr>
 
-TOPLAM MALİYET:
+        <tbody id="liste"></tbody>
+      </table>
 
-<span id="toplam">0</span> TL
+      <div class="bottomBar">
+        <div class="badge">Not: Kalem başlıkları otomatik gruplanır</div>
 
-</div>
+        <div class="toplam">
+          TOPLAM MALİYET:
+          <span id="toplam">0</span> TL
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footerNote">© <span id="yil"></span> Erdoğdular İnşaat • İnşaat Maliyet Takip</div>
+  </div>
 
 <script>
+let veriler = JSON.parse(localStorage.getItem("maliyet")) || [];
 
-let token="BURAYA_YENI_TOKEN";
-let user="ariferdogdu";
-let repo="maliyet";
-let file="veriler.json";
-
-let veriler=[];
-
-function formatTL(s){
-
-return Number(s).toLocaleString('tr-TR');
-
+function kaydet(){
+  localStorage.setItem("maliyet",JSON.stringify(veriler));
 }
 
-
-async function yukle(){
-
-let url=https://api.github.com/repos/${user}/${repo}/contents/${file};
-
-let res=await fetch(url);
-
-let data=await res.json();
-
-let content=atob(data.content);
-
-veriler=JSON.parse(content);
-
-window.sha=data.sha;
-
-goster();
-
+function formatTL(sayi){
+  return Number(sayi).toLocaleString('tr-TR');
 }
 
-
-async function kaydetGit(){
-
-let url=https://api.github.com/repos/${user}/${repo}/contents/${file};
-
-let body={
-
-message:"veri guncellendi",
-
-content:btoa(JSON.stringify(veriler,null,2)),
-
-sha:window.sha
-
-};
-
-
-await fetch(url,{
-
-method:"PUT",
-
-headers:{
-
-Authorization:"token "+token
-
-},
-
-body:JSON.stringify(body)
-
-});
-
-
-yukle();
-
+function setRaporTarih(){
+  const d = new Date();
+  const tarih = d.toLocaleDateString('tr-TR', { year:'numeric', month:'2-digit', day:'2-digit' });
+  const saat  = d.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById("raporTarih").innerText = `Rapor Tarihi: ${tarih} ${saat}`;
+  document.getElementById("yil").innerText = d.getFullYear();
 }
-
-
 
 function goster(){
+  let liste=document.getElementById("liste");
+  liste.innerHTML="";
+  let toplam=0;
+  let kalemler={};
 
-let liste=document.getElementById("liste");
+  veriler.forEach(function(v,i){
+    if(!kalemler[v.kalem]) kalemler[v.kalem]=[];
+    kalemler[v.kalem].push({data:v,index:i});
+    toplam+=Number(v.tutar);
+  });
 
-liste.innerHTML="";
+  for(let kalem in kalemler){
+    liste.innerHTML+=`
+      <tr class="kalemBaslik">
+        <td colspan="4">${kalem}</td>
+      </tr>
+    `;
 
-let toplam=0;
+    kalemler[kalem].forEach(function(v){
+      liste.innerHTML+=`
+        <tr>
+          <td>${v.data.tarih}</td>
+          <td>${v.data.kalem}</td>
+          <td><b>${formatTL(v.data.tutar)}</b> TL</td>
+          <td>
+            <div class="actions">
+              <span class="actionBtn duzenleBtn" title="Düzenle" onclick="duzenle(${v.index})">✏️</span>
+              <span class="actionBtn silBtn" title="Sil" onclick="sil(${v.index})">❌</span>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+  }
 
-let kalemler={};
-
-
-veriler.forEach((v,i)=>{
-
-if(!kalemler[v.kalem]) kalemler[v.kalem]=[];
-
-kalemler[v.kalem].push({data:v,index:i});
-
-toplam+=Number(v.tutar);
-
-});
-
-
-for(let k in kalemler){
-
-liste.innerHTML+=`
-
-<tr class="kalemBaslik">
-
-<td colspan="4">${k}</td>
-
-</tr>
-
-`;
-
-kalemler[k].forEach(v=>{
-
-liste.innerHTML+=`
-
-<tr>
-
-<td>${v.data.tarih}</td>
-
-<td>${v.data.kalem}</td>
-
-<td>${formatTL(v.data.tutar)} TL</td>
-
-<td>
-
-<button class="duzenleBtn" onclick="duzenle(${v.index})">✏️</button>
-
-<button class="silBtn" onclick="sil(${v.index})">❌</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
-
+  document.getElementById("toplam").innerHTML=formatTL(toplam);
+  setRaporTarih();
 }
-
-
-document.getElementById("toplam").innerHTML=formatTL(toplam);
-
-}
-
-
 
 function ekle(){
+  let tarih=document.getElementById("tarih").value;
+  let kalem=document.getElementById("kalem").value.trim();
+  let tutar=document.getElementById("tutar").value;
 
-veriler.push({
+  if(tarih=="" || kalem=="" || tutar==""){
+    alert("Boş alan bırakma");
+    return;
+  }
 
-tarih:document.getElementById("tarih").value,
+  veriler.push({ tarih:tarih, kalem:kalem, tutar:tutar });
+  kaydet();
+  goster();
 
-kalem:document.getElementById("kalem").value,
-
-tutar:document.getElementById("tutar").value
-
-});
-
-kaydetGit();
-
+  document.getElementById("kalem").value="";
+  document.getElementById("tutar").value="";
 }
-
-
 
 function sil(i){
-
-veriler.splice(i,1);
-
-kaydetGit();
-
+  if(confirm("Silmek istiyor musun?")){
+    veriler.splice(i,1);
+    kaydet();
+    goster();
+  }
 }
-
-
 
 function duzenle(i){
+  let yeniTarih=prompt("Yeni tarih:",veriler[i].tarih);
+  if(yeniTarih==null) return;
 
-let t=prompt("Tarih",veriler[i].tarih);
+  let yeniKalem=prompt("Yeni kalem:",veriler[i].kalem);
+  if(yeniKalem==null) return;
 
-let k=prompt("Kalem",veriler[i].kalem);
+  let yeniTutar=prompt("Yeni tutar:",veriler[i].tutar);
+  if(yeniTutar==null) return;
 
-let u=prompt("Tutar",veriler[i].tutar);
+  veriler[i].tarih=yeniTarih;
+  veriler[i].kalem=yeniKalem.trim();
+  veriler[i].tutar=yeniTutar;
 
-veriler[i]={
-
-tarih:t,
-kalem:k,
-tutar:u
-
-};
-
-kaydetGit();
-
+  kaydet();
+  goster();
 }
-
-
 
 function pdfAl(){
+  setRaporTarih();
+  let element=document.getElementById("raporAlan");
 
-html2pdf().from(document.body).save("insaat_maliyet.pdf");
+  const opt = {
+    margin: 8,
+    filename: "erdogdular_insaat_maliyet.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
+  };
 
+  html2pdf().set(opt).from(element).save();
 }
 
-
-
-yukle();
-
+goster();
 </script>
 
 </body>
-
 </html>
